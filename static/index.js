@@ -1,10 +1,56 @@
 function openNav() {
-  document.getElementById("menu").style.width = "250px";
-  document.getElementById("main").style.marginLeft = "250px";}
+    document.getElementById("menu").style.width = "250px";
+    document.getElementById("main").style.marginLeft = "250px";
+    document.getElementById("menubutton").style.display = "none";
+    document.getElementById("channelheader").style.marginLeft = "0";}
 
 function closeNav() {
-  document.getElementById("menu").style.width = "0";
-  document.getElementById("main").style.marginLeft = "0";}
+    document.getElementById("menu").style.width = "0";
+    document.getElementById("main").style.marginLeft = "0";
+    document.getElementById("menubutton").style.display = "block";
+    document.getElementById("channelheader").style.marginLeft = "45px";}
+
+// For testing purposes set values of localStorage
+localStorage.setItem("displayname", "paul");
+localStorage.setItem("currentchannel", "movies");
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Check if displayname has been created
+    if (!localStorage.getItem("displayname")) {
+        // TO DO inlogprocedure
+    }
+    // TO DO hier 'else' gebruiken?
+    const displayname = localStorage.getItem("displayname")
+
+    // Check if displayname is valid
+    // Initialize new request
+    const request = new XMLHttpRequest();
+    request.open('POST', '/checkdisplayname');
+
+    // Callback function for when request completes
+    request.onload = () => {
+
+        // Extract JSON data from request
+        const data = JSON.parse(request.responseText);
+
+        // Update the result div
+        if (data.success) {
+            document.getElementById("displayname").innerHTML = displayname;
+        }
+        else {
+            // TO DO aanmelden of inloggen
+        }
+    }
+
+    // Add data to send with request
+    const data = new FormData();
+    data.append("displayname", displayname);
+
+    // Send request
+    request.send(data);
+
+});
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -64,10 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-
-// Set starting value of counter to 0
-if (!localStorage.getItem('displayname'))
-    localStorage.setItem('displayname', 'dummy');
 
 // Load current value of  counter
 document.addEventListener('DOMContentLoaded', () => {

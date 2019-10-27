@@ -23,6 +23,8 @@
 
     <body class="bg">
 
+        <span id="menubutton" onclick="openNav()">&#9776;</span>
+
         <div id="menu" class="sidenav">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
             <a href="#">You</a>
@@ -36,17 +38,9 @@
           <a href="#">Create new channel</a>
         </div>
 
-        <span id="menubutton" onclick="openNav()">&#9776;</span>
-
         <main id="main">
             {% block main %}{% endblock %}
         </main>
-
-        <footer id="footer">
-            <div>
-                Copyright &#169; Paul Smits
-            </div>
-        </footer>
 
     </body>
 

@@ -11,37 +11,68 @@
     margin-left: 250px;
 }
 
-.header {
-    font-style: italic;
-    font-size: large;
-    padding: 5px;
-    background-color: white;
-    color: black;
+#channelheader {
+    background-color: wheat;
     position: fixed;
     top: 0;
-    margin-left: 60px;
+    padding: 0;
+    margin-left: 0px;
 }
 
-.textblock {
+#channelheaderrow {
+    padding: 0;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+#channelheadertext {
+    font-style: italic;
+    font-size: large;
+    color: black;
+    padding: 0;
+}
+
+.messageheader {
+    font-style: italic;
+    font-size: small;
     background-color: white;
-    padding: 10px;
-    margin: 0;
+    padding: 5px;
+    margin-top: 10px;
+    margin-bottom: 0;
+    margin-right: 0;
+    margin-left: 0;
+}
+
+.messagetext {
+    background-color: white;
+    padding: 5px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    margin-right: 0;
+    margin-left: 0;
 }
 
 #new-message {
-    background-color: white;
+    background-color: wheat;
     padding: 10px;
     position: sticky;
     bottom: 0;
-    margin-left: 15px;
-    margin-right: 15px;
 }
 
 #menubutton {
     font-size: 30px;
     background-color: white;
-    padding: 10px;
-    cursor: pointer
+    position: fixed;
+    top: 0;
+    margin: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 0;
+    padding-bottom: 5px;
+    cursor: pointer;
+    display: none;
 }
 
 .sidenav {
@@ -52,41 +83,40 @@
     top: 0;
     left: 0;
     background-color: white;
+    color: black;
     opacity: 0.9;
     overflow-x: hidden;
     transition: 0.5s;
-    padding-top: 60px;
+    padding-top: 40px;
 }
 
-.sidenav a {
-    padding: 8px 8px 8px 32px;
+.sidenav > span {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 32px;
+    padding-right: 8px;
     text-decoration: none;
-    font-size: 20px;
-    color: black;
+    font-size: medium;
     display: block;
 }
 
+ul li {
+  list-style-type: none;
+  padding-left: 10px;
+}
+
+.sidenav a {
+    color: black;
+}
+
 .sidenav a:hover {
-    color: lightgrey;
+    color: blue;
 }
 
 .sidenav .closebtn {
     position: absolute;
     top: 0;
     right: 25px;
-    font-size: 36px;
+    font-size: 30px;
     margin-left: 50px;
-}
-
-#footer {
-    font-style: italic;
-    font-size: small;
-    padding: 5px;
-    background-color: white;
-    color: black;
-    opacity: 0.8;
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 150px;
 }

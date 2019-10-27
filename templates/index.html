@@ -1,54 +1,116 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block title %}
-    Message Board
-{% endblock %}
+    <head>
 
-{% block main %}
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<header class="header">
-    <div>
-        Messages: Name of channel here
-    </div>
-</header>
+        <!-- documentation at http://getbootstrap.com/docs/4.1/, alternative themes at https://bootswatch.com/ -->
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/static/styles.css">
 
-<ul id="messages">
-    <div class="container">
-        <h3 class="textblock">
-            Random text 1
-        </h3>
-        <p class="textblock">
-            This is just some random text. This is where the messages should go. There is a large margin around this block of text and I cannot find out where this is coming from. I wonder what will happen if there is more text in this block.
-        </p>
-    </div>
-    <div class="container">
-        <h3 class="textblock">
-            Random text 2
-        </h3>
-        <p class="textblock">
-            This is just some random text. This is where the messages should go. There is a large margin around this block of text and I cannot find out where this is coming from. I wonder what will happen if there is more text in this block.
-        </p>
-    </div>
-    <div class="container">
-        <h3 class="textblock">
-            Random text 3
-        </h3>
-        <p class="textblock">
-            This is just some random text. This is where the messages should go. There is a large margin around this block of text and I cannot find out where this is coming from. I wonder what will happen if there is more text in this block.
-        </p>
-    </div>
-</ul>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="{{ url_for('static', filename='index.js') }}"></script>
 
-<form id="new-message">
-    <div class="form-row align-items-center">
-        <div class="col-10">
-            <label class="sr-only" for="message">Name</label>
-            <input id="message" autocomplete="off" autofocus placeholder="New Message" type="text" class="form-control mb-2 mr-sm-2">
+        <title>Flack {% block title %}{% endblock %}</title>
+
+    </head>
+
+    <body class="bg">
+
+        <span id="menubutton" onclick="openNav()">&#9776;</span>
+
+        <div id="menu" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <span>You</span>
+            <ul>
+                <li id="displayname"></li>
+            </ul>
+            <span>Favorite channels</span>
+            <ul>
+                {% for channel in channels %}
+                    <li><a href="#" id="ch_" + "{{ channel }}">{{ channel }}</a></li>
+                {% endfor %}
+            </ul>
+            <span><a href="#">Add favorite</a></span>
+            <span><a href="#">Create new channel</a></span>
+            <span>All channels</span>
+            <ul>
+                {% for channel in channels %}
+                    <li><a href="#" id="ch_" + "{{ channel }}">{{ channel }}</a></li>
+                {% endfor %}
+            </ul>
         </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary mb-2">Submit</button>
-        </div>
-    </div>
-</form>
 
-{% endblock %}
+        <main id="main">
+
+            <div class="container-fluid" id="channelheader">
+                <div class="form-row" id="channelheaderrow">
+                    <div class="col">
+                        <p>
+                            Messages: Name of channel here
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="messages">
+                <div class="container">
+                    <p class="messageheader">
+                        <span>Display name here & timestamp</span>
+                    </p>
+                    <p class="messagetext">
+                        <span>This is just some random text. This is where the messages should go. There is a large margin around this block of text and I cannot find out where this is coming from. I wonder what will happen if there is more text in this block.</span>
+                    </p>
+                </div>
+                <div class="container">
+                    <p class="messageheader">
+                        <span>Display name here </span><span>& timestamp</span>
+                    </p>
+                    <p class="messagetext">
+                        This is just some random text. This is where the messages should go. There is a large margin around this block of text and I cannot find out where this is coming from. I wonder what will happen if there is more text in this block.
+                    </p>
+                </div>
+                <div class="container">
+                    <p class="messageheader">
+                        <span>Display name here </span><span>& timestamp</span>
+                    </p>
+                    <p class="messagetext">
+                        This is just some random text. This is where the messages should go. There is a large margin around this block of text and I cannot find out where this is coming from. I wonder what will happen if there is more text in this block.
+                    </p>
+                </div>
+                <div class="container">
+                    <p class="messageheader">
+                        <span>Display name here </span><span>& timestamp</span>
+                    </p>
+                    <p class="messagetext">
+                        This is just some random text. This is where the messages should go. There is a large margin around this block of text and I cannot find out where this is coming from. I wonder what will happen if there is more text in this block.
+                    </p>
+                </div>
+            </div>
+
+            <div class="container-fluid" id="new-message">
+                <form>
+                    <div class="form-row">
+                        <div class="col">
+                            <input autocomplete="off" autofocus placeholder="New Message" type="text" class="form-control">
+                        </div>
+                        <div class="col-2">
+                            <div class="btn-group btn-group-sm ml-1 mt-1" role="group">
+                                <button type="button" class="btn btn-secondary">Add image</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </main>
+
+    </body>
+
+<html>
