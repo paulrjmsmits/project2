@@ -1,32 +1,125 @@
+// Function to open and close the navigation menu on the left
 function openNav() {
     document.getElementById("menu").style.width = "250px";
     document.getElementById("main").style.marginLeft = "250px";
     document.getElementById("menubutton").style.display = "none";
     document.getElementById("channelheader").style.marginLeft = "0";}
-
 function closeNav() {
     document.getElementById("menu").style.width = "0";
     document.getElementById("main").style.marginLeft = "0";
     document.getElementById("menubutton").style.display = "block";
     document.getElementById("channelheader").style.marginLeft = "45px";}
 
-// For testing purposes set values of localStorage
-localStorage.setItem("displayname", "paul");
-localStorage.setItem("currentchannel", "movies");
+// Function to open and close a dialogue box
+function openForm(dialogueboxname) {
+    document.getElementById(dialogueboxname).style.display = "block";}
+function closeForm() {
+    document.getElementById(dialogueboxname).style.display = "none";}
 
-document.addEventListener('DOMContentLoaded', () => {
+// Function to check whether a display name is available
+// If it is, the display name is added to the server list and the function returns true, otherwise false
+function checkDisplayName(namecandidate) {
 
-    // Check if displayname has been created
-    if (!localStorage.getItem("displayname")) {
-        // TO DO inlogprocedure
-    }
-    // TO DO hier 'else' gebruiken?
-    const displayname = localStorage.getItem("displayname")
-
-    // Check if displayname is valid
     // Initialize new request
     const request = new XMLHttpRequest();
     request.open('POST', '/checkdisplayname');
+
+    // Callback function for when request completes
+    request.onload = () => {
+        // Extract JSON data from request
+        const res = JSON.parse(request.responseText);
+        // Check whether adding the display name was successful
+        return res.success;
+    }
+
+    // Add data to send with request
+    const data = new FormData();
+    data.append("displayname", namecandidate);
+
+    // Send request
+    request.send(data);
+}
+
+// This function initiates a user dialogue that results in a valid new display name, both in localStorage as well as server side
+function addDisplayName() {
+    // Open a dialogue box
+    openForm("newdisplayname");
+    let namecandidate = "";
+    let ready = false;
+
+    // Send the input from the user to the server, repeat this until a new valid name is entered
+    while (!ready) {
+        document.getElementById("newdisplayname").onsubmit = () => {
+            // Retrieve the name that the user entered
+            namecandidate = document.getElementById("displayname").value;
+            ready = checkDisplayName(namecandidate)
+            if (!ready) {
+                document.getElementById("displaynamefeedback").innerHTML = "Display name already in use";
+            }
+            return false;
+        }
+    }
+    // Define the localStorage variable
+    localStorage.setItem("displayname", namecandidate);
+    // Close the dialogue box
+    closeForm("newdisplayname");
+}
+
+// Function to check whether a channel name is available and returns true if it is
+// Note: the channelname is NOT added to the list of channels, this is done via SocketIO
+function checkChannel(namecandidate) {
+
+    // Initialize new request
+    const request = new XMLHttpRequest();
+    request.open('POST', '/checkchannel');
+
+    // Callback function for when request completes
+    request.onload = () => {
+        // Extract JSON data from request
+        const res = JSON.parse(request.responseText);
+        // Check whether adding the display name was successful
+        return res.success;
+    }
+
+    // Add data to send with request
+    const data = new FormData();
+    data.append("channel", namecandidate);
+
+    // Send request
+    request.send(data);
+}
+
+// This function initiates a user dialogue that results in a valid new channel
+// This channel is then broadcasted to all users
+function addChannel() {
+    // Open a dialogue box
+    openForm("newchannel");
+    let namecandidate = "";
+    let ready = false;
+
+    // Send the input from the user to the server, repeat this until a new valid name is entered
+    while (!ready) {
+        document.getElementById("newchannel").onsubmit = () => {
+            // Retrieve the name that the user entered
+            namecandidate = document.getElementById("channel").value;
+            ready = checkChannelName(namecandidate)
+            if (!ready) {
+                document.getElementById("channelfeedback").innerHTML = "Display name already in use";
+            }
+            return false;
+        }
+        // TO DO provide for user cancelling the form
+    }
+
+    // Close the dialogue box
+    closeForm("newchannel");
+}
+
+// Function to load the messages from the given channel on the page
+function loadmessages (channel) {
+    // Initialize new request
+    const request = new XMLHttpRequest();
+    request.open('POST', '/loadmessages');
 
     // Callback function for when request completes
     request.onload = () => {
@@ -34,12 +127,47 @@ document.addEventListener('DOMContentLoaded', () => {
         // Extract JSON data from request
         const data = JSON.parse(request.responseText);
 
-        // Update the result div
-        if (data.success) {
-            document.getElementById("displayname").innerHTML = displayname;
+        // Create the list of messages
+        for (message of data.messages) {
+            const p1 = document.createElement("p");
+            p1.innerHTML = message.user + " " + message.timestamp;
+            p1.classList.add("messageheader");
+            const p2 = document.createElement("p");
+            p2.innerHTML = message.message;
+            p2.classList.add("messagetext");
+            const div = document.createElement("div");
+            div.innerHTML = p1 + p2;
+            div.classList.add("container");
+            document.querySelector("#messages").append(div);
         }
-        else {
-            // TO DO aanmelden of inloggen
+    }
+
+    // Add data to send with request
+    const data = new FormData();
+    data.append("channel", channel);
+
+    // Send request
+    request.send(data);
+}
+
+// Function to load the favorites from the user with the given display name on the page
+function loadfavorites (displayname) {
+    // Initialize new request
+    const request = new XMLHttpRequest();
+    request.open('POST', '/loadfavorites');
+
+    // Callback function for when request completes
+    request.onload = () => {
+
+        // Extract JSON data from request
+        const data = JSON.parse(request.responseText);
+
+        // Create the list of favorites
+        for (favorite of data.favorites) {
+            const li = document.createElement("li");
+            li.innerHTML = favorite;
+            // Add new item to task list
+            document.querySelector("#favorites").append(li);
         }
     }
 
@@ -49,9 +177,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Send request
     request.send(data);
+}
 
-});
+// For testing purposes set values of localStorage
+localStorage.setItem("displayname", "paul");
+localStorage.setItem("currentchannel", "movies");
 
+// When the document has finished loading, perform a number of actions
+document.addEventListener('DOMContentLoaded', () => {
+
+    // STEP 1. INITIALIZE THE PAGE
+
+    // Check if displayname has been created, add the name to the page
+    if (!localStorage.getItem("displayname")) {
+        addDisplayName()
+    }
+    const displayname = localStorage.getItem("displayname")
+    document.getElementById("displayname").innerHTML = displayname;
+
+    loadfavorites(displayname);
+
+    // Get the most recent channel from localStorage and load the messages from that channel
+    if (!localStorage.getItem("currentchannel")) {
+        const currentchannel = ""
+    } else {
+        const currentchannel = localStorage.getItem("currentchannel")
+        loadmessages(currentchannel);
+    }
+};
+
+// STEP 2. CREATE WEBSOCKET TO LISTEN FOR NEW MESSAGES, NEW CHANNELS AND NEW FAVORITES
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -60,70 +215,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // When connected, configure buttons
     socket.on('connect', () => {
+/*
+        // STEP 2A. WHEN NEW CHANNEL IS CREATED, SEND IT TO ALL USERS
 
-        // Each button should emit a "submit vote" event
-        document.querySelectorAll('button').forEach(button => {
-            button.onclick = () => {
-                const selection = button.dataset.vote;
-                socket.emit('submit vote', {'selection': selection});
-            };
-        });
-    });
-
-    // When a new vote is announced, add to the unordered list
-    socket.on('vote totals', data => {
-        document.querySelector('#yes').innerHTML = data.yes;
-        document.querySelector('#no').innerHTML = data.no;
-        document.querySelector('#maybe').innerHTML = data.maybe;
-    });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-
-    // By default, submit button is disabled
-    document.querySelector('#submit').disabled = true;
-
-    // Enable button only if there is text in the input field
-    document.querySelector('#message').onkeyup = () => {
-        if (document.querySelector('#message').value.length > 0)
-            document.querySelector('#submit').disabled = false;
-        else
-            document.querySelector('#submit').disabled = true;
+        // To create a new channel
+        document.getElementById('newchannel').onsubmit = () => {
+            // Select the value of the input field 'channelname'
+            const channel = document.getElementById('channel');
+            socket.emit('add channel', {'channel': channel});
+        }
+*/
     };
 
-    document.querySelector('#new-message').onsubmit = () => {
-
-        // Create new item for list
+    // When a new vote is announced, add to the list
+    socket.on('channel added', data => {
+/*
         const li = document.createElement('li');
-        li.innerHTML = document.querySelector('#message').value;
+        li.innerHTML = data;
+        document.getElementById('channels').append(li);
+*/
+    });
 
-        // Add new item to task list
-        document.querySelector('#messages').append(li);
+    // STEP 2B. WHEN NEW MESSAGE IS CREATED, SEND IT TO ALL USERS
+    // TO DO
 
-        // Clear input field and disable button again
-        document.querySelector('#message').value = '';
-        document.querySelector('#submit').disabled = true;
-
-        // Stop form from submitting
-        return false;
-    };
-
-});
-
-
-// Load current value of  counter
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('#displayname').innerHTML = localStorage.getItem('displayname');
-
-    // Count every time button is clicked
-    document.querySelector('button').onclick = () => {
-        // Increment current display
-        let displayname = localStorage.getItem('displayname');
-
-        // do something with displayname; counter++;
-
-        // Update displayname
-        document.querySelector('#displayname').innerHTML = displayname;
-        localStorage.setItem('displayname', displayname);
-    }
 });

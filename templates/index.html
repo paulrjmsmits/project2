@@ -32,15 +32,12 @@
                 <li id="displayname"></li>
             </ul>
             <span>Favorite channels</span>
-            <ul>
-                {% for channel in channels %}
-                    <li><a href="#" id="ch_" + "{{ channel }}">{{ channel }}</a></li>
-                {% endfor %}
+            <ul id="favorites">
             </ul>
             <span><a href="#">Add favorite</a></span>
             <span><a href="#">Create new channel</a></span>
             <span>All channels</span>
-            <ul>
+            <ul id="channels">
                 {% for channel in channels %}
                     <li><a href="#" id="ch_" + "{{ channel }}">{{ channel }}</a></li>
                 {% endfor %}
@@ -59,7 +56,7 @@
                 </div>
             </div>
 
-            <div class="messages">
+            <div id="messages">
                 <div class="container">
                     <p class="messageheader">
                         <span>Display name here & timestamp</span>
@@ -110,6 +107,34 @@
             </div>
 
         </main>
+
+<!-- pop-up form for creating display name -->
+        <div class="form-popup">
+            <form action="/createdisplayname" id="newdisplayname" class="form-container">
+                <h1>New display name</h1>
+
+                <label for="displayname"><b>Display name</b></label>
+                <input type="text" placeholder="Display name" name="displayname" required>
+                <span id="displaynamefeedback">Feedback</span>
+
+                <button type="submit" class="btn">Create</button>
+                <button type="submit" class="btn cancel" onclick="closeForm('newdisplayname')">Cancel</button>
+            </form>
+        </div>
+
+<!-- pop-up form for creating new channel -->
+        <div class="form-popup">
+            <form action="/createnewchannel" id="newchannel" class="form-container">
+                <h1>New channel</h1>
+
+                <label for="channel"><b>Channel name</b></label>
+                <input type="text" placeholder="Name of new channel" name="channel" required>
+                <span id="channelfeedback">Feedback</span>
+
+                <button type="submit" class="btn">Create</button>
+                <button type="submit" class="btn cancel" onclick="closeForm('newchannel')">Cancel</button>
+            </form>
+        </div>
 
     </body>
 

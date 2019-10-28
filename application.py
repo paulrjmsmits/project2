@@ -20,24 +20,59 @@ channelsmessages = {"movies": [{"user": "paul", "timestamp": "Wed 24 Oct 12:03",
 @app.route("/checkdisplayname", methods=["POST"])
 def checkdisplayname():
 
-    # Query for currency exchange rate
-    # TO DO not sure if syntax is right
+    # Query for displayname and currentchannel
     displayname = request.form.get("displayname")
     print(displayname)
 
     # Check if displayname is in set of users
-    success = displayname in users
-    return jsonify(success)
+    if displayname in users:
+        return jsonify({"success": False})
+    else:
+        users.add(displayname)
+        return jsonify({"success": True})
+
+
+@app.route("/checkchannel", methods=["POST"])
+def checkchannel():
+
+    # Query for displayname and currentchannel
+    channel = request.form.get("channelname")
+    print(channel)
+
+    # Check if displayname is in set of users
+    return jsonify({"success": not channel in channels})
+
+
+@socketio.on("add channel")
+def addchannel(data):
+    channel = data["channel"]
+    channels.add(channel)
+    emit("channel added", channel, broadcast=True)
+
+
+@app.route("/loadfavorites", methods=["POST"])
+def loadfavorites():
+
+    # Query for displayname and currentchannel
+    displayname = request.form.get("displayname")
+    print(displayname)
+
+    # Return the favorites and the messages in the currentchannel
+    return jsonify({"favorites": usersfavorites[displayname]})
+
+
+@app.route("/loadmessages", methods=["POST"])
+def loadmessages():
+
+    # Query for displayname and currentchannel
+    currentchannel = request.form.get("currentchannel")
+    print(currentchannel)
+
+    # Return the favorites and the messages in the currentchannel
+    return jsonify({"messages": channelsmessages[currentchannel]})
 
 
 @app.route("/")
 def index():
     channels.append("streetlife")
     return render_template("index.html", channels=channels)
-
-
-@socketio.on("submit vote")
-def vote(data):
-    selection = data["selection"]
-    votes[selection] += 1
-    emit("vote totals", votes, broadcast=True)
