@@ -8,7 +8,6 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
-votes = {"yes": 0, "no": 0, "maybe": 0}
 users = {"paul", "demo"}
 channels = ["movies", "restaurants", "bars", "festivals"]
 usersfavorites = {"paul": ["movies", "restaurants"], "demo": ["restaurants", "bars"]}
@@ -17,8 +16,14 @@ channelsmessages = {"movies": [{"user": "paul", "timestamp": "Wed 24 Oct 12:03",
                             "restaurants": [{"user": "demo", "timestamp": "Thu 25 Oct 11:00", "message": "first message in restaurants"}]}
 
 
-@app.route("/checkdisplayname", methods=["POST"])
-def checkdisplayname():
+@app.route("/")
+def index():
+    channels.append("streetlife")
+    return render_template("index.html", channels=channels)
+
+
+@app.route("/adddisplayname", methods=["POST"])
+def adddisplayname():
 
     # Query for displayname and currentchannel
     displayname = request.form.get("displayname")
@@ -36,18 +41,12 @@ def checkdisplayname():
 def checkchannel():
 
     # Query for displayname and currentchannel
-    channel = request.form.get("channelname")
+    channel = request.form.get("channel")
     print(channel)
+    print(not channel in channels)
 
     # Check if displayname is in set of users
     return jsonify({"success": not channel in channels})
-
-
-@socketio.on("add channel")
-def addchannel(data):
-    channel = data["channel"]
-    channels.add(channel)
-    emit("channel added", channel, broadcast=True)
 
 
 @app.route("/loadfavorites", methods=["POST"])
@@ -55,7 +54,7 @@ def loadfavorites():
 
     # Query for displayname and currentchannel
     displayname = request.form.get("displayname")
-    print(displayname)
+    print("load favorites:", displayname)
 
     # Return the favorites and the messages in the currentchannel
     return jsonify({"favorites": usersfavorites[displayname]})
@@ -65,14 +64,19 @@ def loadfavorites():
 def loadmessages():
 
     # Query for displayname and currentchannel
-    currentchannel = request.form.get("currentchannel")
-    print(currentchannel)
+    channel = request.form.get("channel")
 
     # Return the favorites and the messages in the currentchannel
-    return jsonify({"messages": channelsmessages[currentchannel]})
+    return jsonify({"messages": channelsmessages[channel]})
 
 
-@app.route("/")
-def index():
-    channels.append("streetlife")
-    return render_template("index.html", channels=channels)
+@socketio.on("add channel")
+def addchannel(data):
+    channel = data["channel"]
+    print("on server: ", channel)
+    available = not channel in channels
+    if available:
+        channels.append(channel)
+        emit("channel added", {"available": available, "channel": channel}, broadcast=True)
+    else:
+        emit("channel added", {"available": available, "channel": channel}, broadcast=False)
