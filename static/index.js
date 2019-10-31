@@ -12,70 +12,71 @@ function closeNav() {
 
 // Function to open and close a dialogue box
 function openForm() {
-    document.getElementById('newdisplayname').style.display = "block";}
+    document.getElementById('overlay').style.display = "block";
+    document.getElementById('displayname-popup').style.display = "block";}
 function closeForm() {
-    document.getElementById('newdisplayname').style.display = "none";}
+    document.getElementById('displayname-popup').style.display = "none";
+    document.getElementById('overlay').style.display = "none";}
 
-// Function to check whether a display name is available
-// If it is, the display name is added to the server list and the function returns true, otherwise false
-function addDisplayName(namecandidate) {
-
+// Function to add a favorite to the list on the server and display it on the page
+function addfavorite(favorite) {
     // Initialize new request
     const request = new XMLHttpRequest();
-    request.open('POST', '/adddisplayname');
+    request.open('POST', '/addfavorite');
 
-    // Callback function for when request completes
+    //Callback function for when request completes
     request.onload = () => {
+
         // Extract JSON data from request
-        const res = JSON.parse(request.responseText);
-
-        if (res.success) {
-            // Define the localStorage variable
-            localStorage.setItem("displayname", namecandidate);
-            document.getElementById('displaynamefeedback').innerHTML = '';
-            // Close the dialogue box
-            // closeForm("newdisplayname");
-        } else {
-            document.getElementById('displaynamefeedback').innerHTML = 'Already in use';
+        const data = JSON.parse(request.responseText);
+        if (data.success) {
+            const a = document.createElement("a");
+            a.setAttribute('onclick', "loadmessages('" + favorite + "')");
+            a.href = 'javascript:void(0)';
+            a.innerHTML = favorite;
+            const li = document.createElement("li");
+            li.id = favorite + '-id';
+            li.appendChild(a);
+            document.getElementById("favorites").append(li);
         }
-
     }
 
-    // Add data to send with request
+    // Add data to request
     const data = new FormData();
-    data.append("displayname", namecandidate);
+    data.append("favorite", favorite);
+    data.append("displayname", localStorage.getItem("displayname"));
 
     // Send request
     request.send(data);
 }
 
-// This function initiates a user dialogue that results in a valid new display name, both in localStorage as well as server side
-function addDisplayName() {
-    // Open a dialogue box
-    openForm("newdisplayname");
-    let namecandidate = "";
-    let ready = false;
+// Function to remove a favorite from the list
+function removefavorite(favorite) {
+    // Initialize new request
+    const request = new XMLHttpRequest();
+    request.open('POST', '/removefavorite');
 
-    // Send the input from the user to the server, repeat this until a new valid name is entered
-    while (!ready) {
-        document.getElementById("newdisplayname").onsubmit = () => {
-            // Retrieve the name that the user entered
-            namecandidate = document.getElementById("displayname").value;
-            ready = checkDisplayName(namecandidate)
-            if (!ready) {
-                document.getElementById("displaynamefeedback").innerHTML = "Display name already in use";
-            }
-            return false;
+    // Callback function for when request is complete
+    request.onload = () => {
+        // Extract JSON data from request
+        const data = JSON.parse(request.responseText);
+        if (data.success) {
+            const element = document.getElementById(favorite + '-id');
+            element.parentNode.removeChild(element);
         }
     }
-    // Define the localStorage variable
-    localStorage.setItem("displayname", namecandidate);
-    // Close the dialogue box
-    closeForm("newdisplayname");
+
+    // Add data to request
+    const data = new FormData();
+    data.append("favorite", favorite);
+    data.append("displayname", localStorage.getItem("displayname"));
+
+    // Send data
+    request.send(data);
 }
 
 // Function to load the favorites from the user with the given display name on the page
-function loadfavorites (displayname) {
+function loadfavorites () {
     // Initialize new request
     const request = new XMLHttpRequest();
     request.open('POST', '/loadfavorites');
@@ -87,24 +88,36 @@ function loadfavorites (displayname) {
         const data = JSON.parse(request.responseText);
 
         // Create the list of favorites
-        for (favorite of data.favorites) {
-            const li = document.createElement("li");
-            li.innerHTML = favorite;
-            // Add new item to task list
-            document.querySelector("#favorites").append(li);
+        if (data.present) {
+            for (favorite of data.favorites) {
+                const a = document.createElement("a");
+                a.setAttribute('onclick', "loadmessages('" + favorite + "')");
+                a.href = 'javascript:void(0)';
+                a.innerHTML = favorite;
+                const li = document.createElement("li");
+                li.id = favorite + '-id';
+                li.appendChild(a);
+                document.getElementById("favorites").append(li);
+            }
         }
     }
 
     // Add data to send with request
     const data = new FormData();
-    data.append("displayname", displayname);
+    data.append("displayname", localStorage.getItem("displayname"));
 
     // Send request
     request.send(data);
 }
 
 // Function to load the messages from the given channel on the page
-function loadmessages (channel) {
+function loadmessages(channel) {
+
+    // Clear the contents of the messages window
+    document.getElementById("messages").innerHTML = "";
+    // Put the channel name in the header
+    document.getElementById("channelheadertext").innerHTML = "Channel: " + channel;
+
     // Initialize new request
     const request = new XMLHttpRequest();
     request.open('POST', '/loadmessages');
@@ -115,34 +128,48 @@ function loadmessages (channel) {
         // Extract JSON data from request
         const data = JSON.parse(request.responseText);
 
-        // Create the list of messages
-        for (message of data.messages) {
-            const p1 = document.createElement("p");
-            p1.innerHTML = message.user + " " + message.timestamp;
-            p1.classList.add("messageheader");
-            const p2 = document.createElement("p");
-            p2.innerHTML = message.message;
-            p2.classList.add("messagetext");
-            const div = document.createElement("div");
-            div.appendChild(p1);
-            div.appendChild(p2);
-            div.classList.add("container");
-            document.querySelector("#messages").append(div);
+        // Put a 'remove from favorites' or 'add to favorites' button in the header
+        if (data.favorite) {
+            document.getElementById("favorite-button").innerHTML = "Remove from favorites";
+            document.getElementById("favorite-button").setAttribute('onclick', "removefavorite('" + channel + "')");
+        } else {
+            document.getElementById("favorite-button").innerHTML = "Add to favorites";
+            document.getElementById("favorite-button").setAttribute('onclick', "addfavorite('" + channel + "')");
         }
-    };
+
+        // Create the list of messages
+        if (data.present) {
+            for (message of data.messages) {
+                const p1 = document.createElement("p");
+                p1.innerHTML = message.user + " " + message.timestamp;
+                p1.classList.add("messageheader");
+                const p2 = document.createElement("p");
+                p2.innerHTML = message.message;
+                p2.classList.add("messagetext");
+                const div = document.createElement("div");
+                div.appendChild(p1);
+                div.appendChild(p2);
+                div.classList.add("container");
+                document.getElementById("messages").append(div);
+            }
+        }
+        // Adjust the localStorage variable
+        localStorage.setItem("currentchannel", channel);
+    }
 
     // Add data to send with request
     const data = new FormData();
     data.append("channel", channel);
+    data.append("displayname", localStorage.getItem("displayname"));
 
     // Send request
     request.send(data);
 }
 
-// For testing purposes set values of localStorage
-// localStorage.setItem("displayname", "paul");
-localStorage.removeItem("displayname");
-localStorage.setItem("currentchannel", "");
+// For testing purposes:
+//localStorage.setItem("displayname", "paul");
+// localStorage.removeItem("displayname");
+//localStorage.setItem("currentchannel", "movies");
 
 // When the document has finished loading, perform a number of actions
 document.addEventListener('DOMContentLoaded', () => {
@@ -151,12 +178,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check if displayname has been created, add the name to the page
     if (!localStorage.getItem("displayname")) {
-
+        // Open a dialogue box for a new display name
         openForm();
-        document.getElementById("newdisplayname").onsubmit = () => {
+        document.getElementById("displayname-form").onsubmit = () => {
 
             // Retrieve the name that the user entered
-            const namecandidate = document.getElementById("displayname").value;
+            const namecandidate = document.getElementById("displayname-input").value;
 
             // Initialize new request
             const request = new XMLHttpRequest();
@@ -170,12 +197,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (res.success) {
                     // Define the localStorage variable
                     localStorage.setItem("displayname", namecandidate);
-                    document.getElementById("displayname").innerHTML = displayname;
-                    document.getElementById('displaynamefeedback').innerHTML = '';
+                    document.getElementById("displayname").innerHTML = namecandidate;
+                    document.getElementById('displayname-feedback').innerHTML = '';
                     // Close the dialogue box
-                    // closeForm("newdisplayname");
+                    closeForm();
                 } else {
-                    document.getElementById('displaynamefeedback').innerHTML = 'Already in use';
+                    document.getElementById('displayname-feedback').innerHTML = 'Already in use';
                 }
             }
 
@@ -183,24 +210,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = new FormData();
             data.append("displayname", namecandidate);
 
-            // Send request
+            // Send request and prevent form from submitting
             request.send(data);
             return false;
         };
     } else {
+        // Get the display name from localStorage
         const displayname = localStorage.getItem("displayname");
         document.getElementById("displayname").innerHTML = displayname;
-        console.log(displayname);
-        loadfavorites(displayname);
+        loadfavorites();
+        // Get the most recent channel from localStorage and load the messages from that channel
+        if (localStorage.getItem("currentchannel")) {
+            const currentchannel = localStorage.getItem("currentchannel")
+            loadmessages(currentchannel);
+        }
     }
 
-    // Get the most recent channel from localStorage and load the messages from that channel
-    if (localStorage.getItem("currentchannel")) {
-        const currentchannel = localStorage.getItem("currentchannel")
-        loadmessages(currentchannel);
-    }
-
-// STEP 2. CREATE WEBSOCKET TO LISTEN FOR NEW MESSAGES, NEW CHANNELS AND NEW FAVORITES
+// STEP 2. CREATE WEBSOCKET TO LISTEN FOR NEW MESSAGES AND NEW CHANNELS
 
     // Connect to websocket
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
@@ -212,11 +238,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // To create a new channel
         document.getElementById('newchannel').onsubmit = () => {
-            // Select the value of the input field 'channelname'
+
+            // Select the value of the input field 'channel'
             const channel = document.getElementById('channel').value;
-            console.log("emitted data: " + channel);
+
+            // Send the channel to all users, empty the input form and prevent it from submitting
             socket.emit('add channel', {'channel': channel});
-            // document.getElementById('channelfeedback').innerHTML = '';
             document.getElementById('channel').value = '';
             return false;
         }
@@ -227,9 +254,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add the newly created channel to the list of channels
         console.log("received data: " + data)
         if (data.available) {
-            const li = document.createElement('li');
-            li.innerHTML = data.channel;
-            document.getElementById('channels').append(li);
+
+            // Create the HTML-element and append it to the list of channels
+            const a = document.createElement("a");
+            a.setAttribute('onclick', "loadmessages('" + data.channel + "')");
+            a.href = 'javascript:void(0)';
+            a.innerHTML = data.channel;
+            const li = document.createElement("li");
+            li.id = data.channel + '-id';
+            li.appendChild(a);
+            console.log(li);
+            document.getElementById("channels").append(li);
+
+            // Clear the input form
             document.getElementById('channelfeedback').innerHTML = '';
         } else {
             document.getElementById('channelfeedback').innerHTML = 'Already in use';

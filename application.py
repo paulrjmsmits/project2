@@ -18,7 +18,6 @@ channelsmessages = {"movies": [{"user": "paul", "timestamp": "Wed 24 Oct 12:03",
 
 @app.route("/")
 def index():
-    channels.append("streetlife")
     return render_template("index.html", channels=channels)
 
 
@@ -27,7 +26,6 @@ def adddisplayname():
 
     # Query for displayname and currentchannel
     displayname = request.form.get("displayname")
-    print(displayname)
 
     # Check if displayname is in set of users
     if displayname in users:
@@ -48,26 +46,61 @@ def checkchannel():
     # Check if displayname is in set of users
     return jsonify({"success": not channel in channels})
 
+@app.route("/addfavorite", methods=["POST"])
+def addfavorite():
+
+    # Query for favorite
+    favorite = request.form.get("favorite")
+    displayname = request.form.get("displayname")
+
+    if not favorite in usersfavorites[displayname]:
+        usersfavorites[displayname].append(favorite)
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False})
+
+@app.route("/removefavorite", methods=["POST"])
+def removefavorite():
+
+    # Query for favorite
+    favorite = request.form.get("favorite")
+    displayname = request.form.get("displayname")
+
+    if favorite in usersfavorites[displayname]:
+        usersfavorites[displayname].remove(favorite)
+        print(usersfavorites[displayname])
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False})
 
 @app.route("/loadfavorites", methods=["POST"])
 def loadfavorites():
 
-    # Query for displayname and currentchannel
+    # Query for displayname
     displayname = request.form.get("displayname")
-    print("load favorites:", displayname)
+
+    if displayname in usersfavorites:
+        return jsonify({"present": True, "favorites": usersfavorites[displayname]})
+    else:
+        return jsonify({"present": False})
 
     # Return the favorites and the messages in the currentchannel
-    return jsonify({"favorites": usersfavorites[displayname]})
 
 
 @app.route("/loadmessages", methods=["POST"])
 def loadmessages():
 
-    # Query for displayname and currentchannel
+    # Query for current channel
     channel = request.form.get("channel")
+    print(channel)
+    displayname = request.form.get("displayname")
+    print(displayname)
+    favorite = channel in usersfavorites[displayname];
 
-    # Return the favorites and the messages in the currentchannel
-    return jsonify({"messages": channelsmessages[channel]})
+    if channel in channelsmessages:
+        return jsonify({"present": True, "favorite": favorite, "messages": channelsmessages[channel]})
+    else:
+        return jsonify({"present": False, "favorite": favorite})
 
 
 @socketio.on("add channel")

@@ -36,75 +36,38 @@
             <ul id="favorites">
             </ul>
             <span>Create new channel:</span>
-            <form id="newchannel" class="form-container">
+            <form id="newchannel">
                 <input id="channel" type="text" placeholder="New channel" name="channel" required>
             </form>
-            <span id="channelfeedback">Feedback</span><br>
+            <span id="channelfeedback"></span><br>
             <span>All channels</span>
             <ul id="channels">
                 {% for channel in channels %}
-                    <li><a href="#" id="ch_" + "{{ channel }}">{{ channel }}</a></li>
+                    <li><a href="javascript:void(0)" onclick="loadmessages('{{ channel }}')">{{ channel }}</a></li>
                 {% endfor %}
             </ul>
         </div>
 
         <main id="main">
 
-            <div class="container-fluid" id="channelheader">
-                <div class="form-row" id="channelheaderrow">
+            <div id="channelheader" class="container-fluid">
+                <div id="channelheaderrow" class="row">
+                    <div id="channelheadertext" class="col">
+                    </div>
                     <div class="col">
-                        <p>
-                            Messages: Name of channel here
-                        </p>
+                        <button id="favorite-button" type="button" class="btn btn-secondary btn-sm">Add to favorites</button>
                     </div>
                 </div>
             </div>
 
             <div id="messages">
-                <div class="container">
-                    <p class="messageheader">
-                        <span>Display name here & timestamp</span>
-                    </p>
-                    <p class="messagetext">
-                        <span>This is just some random text. This is where the messages should go. There is a large margin around this block of text and I cannot find out where this is coming from. I wonder what will happen if there is more text in this block.</span>
-                    </p>
-                </div>
-                <div class="container">
-                    <p class="messageheader">
-                        <span>Display name here </span><span>& timestamp</span>
-                    </p>
-                    <p class="messagetext">
-                        This is just some random text. This is where the messages should go. There is a large margin around this block of text and I cannot find out where this is coming from. I wonder what will happen if there is more text in this block.
-                    </p>
-                </div>
-                <div class="container">
-                    <p class="messageheader">
-                        <span>Display name here </span><span>& timestamp</span>
-                    </p>
-                    <p class="messagetext">
-                        This is just some random text. This is where the messages should go. There is a large margin around this block of text and I cannot find out where this is coming from. I wonder what will happen if there is more text in this block.
-                    </p>
-                </div>
-                <div class="container">
-                    <p class="messageheader">
-                        <span>Display name here </span><span>& timestamp</span>
-                    </p>
-                    <p class="messagetext">
-                        This is just some random text. This is where the messages should go. There is a large margin around this block of text and I cannot find out where this is coming from. I wonder what will happen if there is more text in this block.
-                    </p>
-                </div>
             </div>
 
-            <div class="container-fluid" id="new-message">
+            <div id="new-message" class="container-fluid">
                 <form>
                     <div class="form-row">
                         <div class="col">
                             <input autocomplete="off" autofocus placeholder="New Message" type="text" class="form-control">
-                        </div>
-                        <div class="col-2">
-                            <div class="btn-group btn-group-sm ml-1 mt-1" role="group">
-                                <button type="button" class="btn btn-secondary">Add image</button>
-                            </div>
                         </div>
                     </div>
                 </form>
@@ -115,12 +78,12 @@
 <!-- pop-up form for creating display name -->
         <div id="overlay">
         </div>
-        <div class="form-popup">
-            <form action="/createdisplayname" id="newdisplayname" class="form-container">
-                <h3>Please create a display name</h3>
+        <div id="displayname-popup" class="form-popup">
+            <form id="displayname-form" action="" class="form-container">
+                <h4>Please create a display name</h4>
                 <span>Your display name will be visible with every message that you send</span>
-                <input type="text" placeholder="Display name" name="displayname" required>
-                <br><span id="displaynamefeedback">Feedback</span>
+                <input id="displayname-input" type="text" placeholder="Display name" required><br>
+                <span id="displayname-feedback"></span><br>
                 <button type="submit" class="btn">Create</button>
             </form>
         </div>
