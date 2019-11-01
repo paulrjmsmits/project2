@@ -18,7 +18,7 @@
         <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
         <script src="{{ url_for('static', filename='index.js') }}"></script>
 
-        <title>Flack {% block title %}{% endblock %}</title>
+        <title>Flack</title>
 
     </head>
 
@@ -36,8 +36,8 @@
             <ul id="favorites">
             </ul>
             <span>Create new channel:</span>
-            <form id="newchannel">
-                <input id="channel" type="text" placeholder="New channel" name="channel" required>
+            <form id="newchannel-form">
+                <input id="newchannel-input" type="text" placeholder="New channel" name="channel" required>
             </form>
             <span id="channelfeedback"></span><br>
             <span>All channels</span>
@@ -63,11 +63,11 @@
             <div id="messages">
             </div>
 
-            <div id="new-message" class="container-fluid">
-                <form>
+            <div id="newmessage-field" class="container-fluid">
+                <form id="newmessage-form">
                     <div class="form-row">
                         <div class="col">
-                            <input autocomplete="off" autofocus placeholder="New Message" type="text" class="form-control">
+                            <input id="newmessage-input" autocomplete="off" autofocus placeholder="New Message" type="text" class="form-control">
                         </div>
                     </div>
                 </form>

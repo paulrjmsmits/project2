@@ -1,3 +1,4 @@
+/* Background image */
 .bg {
     height: 100%;
     background-position: top;
@@ -5,12 +6,14 @@
     background-image: url("background_messageboard.jpg");
 }
 
+/* Main window, containing header and messages */
 #main {
     transition: margin-left .5s;
     padding: 0px;
     margin-left: 250px;
 }
 
+/* Header with channel name and remove / add favorite button */
 #channelheader {
     background-color: wheat;
     position: fixed;
@@ -38,6 +41,7 @@
     margin-bottom: 5px;
 }
 
+/* Messages windown, with header and text per message */
 #messages {
     margin-top: 60px;
 }
@@ -62,13 +66,15 @@
     margin-left: 0;
 }
 
-#new-message {
+/* Input field for new messages */
+#newmessage-field {
     background-color: wheat;
     padding: 10px;
     position: sticky;
     bottom: 0;
 }
 
+/* Menu button which opens the menu window after it has been collapsed */
 #menubutton {
     font-size: 30px;
     background-color: white;
@@ -78,11 +84,12 @@
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 0;
-    padding-bottom: 5px;
+    padding-bottom: 1px;
     cursor: pointer;
     display: none;
 }
 
+/* Menu with lists of favorites and channels, input for new channel and feedback, and hover effects */
 .sidenav {
     height: 100%;
     width: 250px;
@@ -118,7 +125,7 @@
     padding-left: 42px;
 }
 
-ul li {
+.sidenav ul li {
   list-style-type: none;
   padding-left: 10px;
 }
@@ -139,6 +146,7 @@ ul li {
     margin-left: 50px;
 }
 
+/* Pop-up form to input a new display name, with overlay to block other input */
 #overlay {
     display: none;
     position: fixed;
@@ -151,7 +159,6 @@ ul li {
     opacity: 0.6;
 }
 
-/* For popup form with form for display name - hidden by default */
 .form-popup {
     position: absolute;
     left: 50%;
@@ -164,14 +171,13 @@ ul li {
     display: none;
 }
 
-/* Add styles to the form container */
 .form-container {
-  max-width: 300px;
-  width: 100%;
-  background-color: white;
-  padding: 15px;
-  margin: 15px;
-  background: whitesmoke;
+    max-width: 300px;
+    width: 100%;
+    background-color: white;
+    padding: 15px;
+    margin: 15px;
+    background: whitesmoke;
 }
 
 #displayname-feedback {
@@ -180,18 +186,16 @@ ul li {
     color: red;
 }
 
-/* Set a style for the submit/login button */
 .form-container .btn {
-  background-color: green;
-  color: white;
-  padding: 5px;
-  cursor: pointer;
-  width: 60%;
-  margin: 5px;
-  opacity: 0.8;
+    background-color: green;
+    color: white;
+    padding: 5px;
+    cursor: pointer;
+    width: 60%;
+    margin: 5px;
+    opacity: 0.8;
 }
 
-/* Add some hover effects to buttons */
 .form-container .btn:hover, .open-button:hover {
-  opacity: 1;
+    opacity: 1;
 }
